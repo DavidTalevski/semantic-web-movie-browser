@@ -1,0 +1,19 @@
+{
+  "name": "semantic-web-movie-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm --prefix neo4j-express-api start\" \"npm --prefix movie-search-app start\""
+  },
+  "keywords": [],
+  "author": "David Talevski",
+  "license": "ISC",
+  "workspaces": [
+    "neo4j-express-api",
+    "movie-search-app"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
