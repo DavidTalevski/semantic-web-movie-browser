@@ -1,0 +1,74 @@
+.actor-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  
+  .actor-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .avatar-container {
+    position: relative;
+    margin: -1.5rem -1.5rem 1rem -1.5rem;
+  }
+  
+  .avatar-fallback {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(45deg, #e50914, #b81d24);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .actor-name {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.4rem;
+    line-height: 1.3;
+  }
+  
+  .lifespan {
+    color: #cccccc;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .profession {
+    color: #e50914;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+  
+  .stats {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+  
+  .stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+  
+  .stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 0.3rem;
+  }
+  
+  .stat-value {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
