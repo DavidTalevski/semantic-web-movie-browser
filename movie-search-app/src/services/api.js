@@ -16,12 +16,14 @@ export const getNeo4jInfo = async () => {
 };
 
 // Movies
-export const getMovies = async (page = 1) => {
+export const getMovies = async (page = 1, search = '', sort = 'year') => {
   try {
     const response = await api.get('/movies', {
       params: {
-        page: page | 0,  // Force integer using bitwise OR
-        limit: 24         // Explicit integer
+        page: page | 0,
+        limit: 24,
+        search,
+        sort
       }
     });
     return response.data;
@@ -30,14 +32,14 @@ export const getMovies = async (page = 1) => {
     throw error;
   }
 };
-
 // Actors
-export const getActors = async (page = 1) => {
+export const getActors = async (page = 1, search = '') => {
   try {
     const response = await api.get('/actors', {
       params: {
         page: parseInt(page, 10),
-        limit: 24
+        limit: 24,
+        search
       }
     });
     return response.data;
@@ -87,6 +89,26 @@ export const getDirectorMovies = async (id) => {
     return response.data;
   } catch (error) {
     console.error('Error fetching director movies:', error);
+    throw error;
+  }
+};
+
+export const getMovieDetails = async (id) => {
+  try {
+    const response = await api.get(`/movies/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching movie details:', error);
+    throw error;
+  }
+};
+
+export const getActorDetails = async (id) => {
+  try {
+    const response = await api.get(`/actors/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching actor details:', error);
     throw error;
   }
 };

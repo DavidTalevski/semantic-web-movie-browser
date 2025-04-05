@@ -1,32 +1,17 @@
 import React, { useState } from 'react';
-import './MovieCard.css';
+import { Link } from 'react-router-dom';
+import './MovieCard.css';import {
+  safeNumber,
+  formatNumber,
+  formatCompactNumber,
+  formatRuntime,
+  enhancePosterUrl,
+} from '../../utils/movieUtils';
 
 const MovieCard = ({ movie }) => {
   const [imageError, setImageError] = useState(false);
 
-  // Ensure safe number conversion from Neo4j integer objects
-  const safeNumber = (num) =>
-    typeof num === 'object' && num !== null ? num.low || num.high || 'N/A' : num || 'N/A';
 
-  // Format numbers with commas
-  const formatNumber = (num) => {
-    const number = safeNumber(num);
-    return typeof number === 'number' ? number.toLocaleString() : number;
-  };
-
-  // Format large numbers (e.g., 1.8K, 2.5M)
-  const formatCompactNumber = (num) => {
-    const number = safeNumber(num);
-    return typeof number === 'number'
-      ? Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(number)
-      : 'N/A';
-  };
-
-  // Enhance poster URL by modifying resolution parameters
-  const enhancePosterUrl = (url) => {
-    if (!url) return null;
-    return url.replace(/_V1_.*\.jpg/, '_V1_UX512_.jpg'); // Ensure high-resolution fallback
-  };
 
   // Get the best available poster
   const posterUrl = enhancePosterUrl(movie.posterLink);
@@ -36,12 +21,6 @@ const MovieCard = ({ movie }) => {
     setImageError(true);
   };
 
-  // Format runtime into 'Xh Ym'
-  const formatRuntime = (runtime) => {
-    if (!runtime) return 'N/A';
-    const minutes = parseInt(runtime, 10);
-    return minutes > 0 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes} min`;
-  };
 
   return (
     <div className="movie-card">
@@ -93,6 +72,13 @@ const MovieCard = ({ movie }) => {
         </div>
 
         <p className="movie-overview">{movie.overview || 'No overview available...'}</p>
+
+        
+        <div className="details-button-container">
+          <Link to={`/movies/${movie.id}`} className="details-button">
+            View Details
+          </Link>
+        </div>
       </div>
     </div>
   );

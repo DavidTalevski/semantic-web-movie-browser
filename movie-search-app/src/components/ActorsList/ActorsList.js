@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getActors } from '../../services/api';
 import ActorCard from '../ActorCard/ActorCard';
 import './ActorsList.css';
+import useDebounce from '../../hooks/useDebounce';
 
 const ActorsList = () => {
   const [actors, setActors] = useState([]);
@@ -11,11 +12,23 @@ const ActorsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
-  const fetchActors = useCallback(async (page = 1) => {
+  const fetchActors = useCallback(async (page = 1, search = '') => {
     try {
-      const data = await getActors(page);
-      setActors(prev => [...prev, ...data]);
+      const data = await getActors(page, search);
+      
+      setActors(prev => {
+        // Reset list when new search or first page
+        if (page === 1) return data;
+        
+        // Filter duplicates for subsequent pages
+        const existingIds = new Set(prev.map(actor => actor.id));
+        const newActors = data.filter(actor => !existingIds.has(actor.id));
+        return [...prev, ...newActors];
+      });
+      
       setHasMore(data.length > 0);
     } catch (err) {
       setError(err.message);
@@ -25,36 +38,27 @@ const ActorsList = () => {
     }
   }, []);
 
-  // Initial load
+  // Handle search and initial load
   useEffect(() => {
-    fetchActors();
-  }, [fetchActors]);
+    setCurrentPage(1);
+    fetchActors(1, debouncedSearch);
+  }, [debouncedSearch, fetchActors]);
 
-  // Scroll handler
+  // Scroll handler for pagination
   useEffect(() => {
     const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop + 500 >= 
-        document.documentElement.offsetHeight &&
-        !isLoadingMore &&
-        hasMore
-      ) {
-        setIsLoadingMore(true);
-        setCurrentPage(prev => prev + 1);
-        fetchActors(currentPage + 1);
-      }
+      if (window.innerHeight + document.documentElement.scrollTop + 500 < 
+         document.documentElement.offsetHeight || isLoadingMore || !hasMore) return;
+
+      setIsLoadingMore(true);
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchActors(nextPage, debouncedSearch);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLoadingMore, hasMore, currentPage, fetchActors]);
-
-  const filteredActors = actors.filter(actor =>
-    actor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    actor.primaryProfession.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    String(actor.birthYear).includes(searchQuery) ||
-    String(actor.deathYear).includes(searchQuery)
-  );
+  }, [currentPage, isLoadingMore, hasMore, debouncedSearch, fetchActors]);
 
   if (error) return <div className="error">Error: {error}</div>;
 
@@ -65,7 +69,7 @@ const ActorsList = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search actors..."
+          placeholder="Search actors, directors and writers..."
           className="search-input"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -84,7 +88,7 @@ const ActorsList = () => {
       ) : (
         <>
           <div className="actors-grid">
-            {filteredActors.map((actor, index) => (
+            {actors.map((actor, index) => (
               <ActorCard 
                 key={`${actor.id}-${index}`}
                 actor={actor}

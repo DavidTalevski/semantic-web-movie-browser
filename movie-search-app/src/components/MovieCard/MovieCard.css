@@ -68,6 +68,28 @@
   font-weight: 500;
 }
 
+.details-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.details-button {
+  background: #e50914;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  border: none;
+}
+
+.details-button:hover {
+  background: #b20710;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

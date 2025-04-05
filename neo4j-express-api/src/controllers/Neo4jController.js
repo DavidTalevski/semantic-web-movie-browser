@@ -19,16 +19,45 @@ class Neo4jController {
 
   async getMovies(req, res) {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 24;
-        const skip = (page - 1) * limit;
+      const { page, limit, search, sort } = req.query;
+      const validSorts = ['year', 'rating', 'votes', 'gross'];
+      const sortFieldMap = {
+        year: 'm.releasedYear',
+        rating: 'm.imdbRating',
+        votes: 'm.noOfVotes',
+        gross: 'm.gross'
+      };
 
-        const result = await executeQuery(
-          `MATCH (m:Movie) RETURN properties(m) AS movie SKIP toInteger($skip) LIMIT toInteger($limit)`,
-          { skip: parseInt(skip, 10), limit: parseInt(limit, 10) }
-        );
-      
-        const movies = result.map(record => {
+      // Validate sort parameter
+      const sortField = validSorts.includes(sort)
+        ? sortFieldMap[sort]
+        : 'm.releasedYear';
+
+      const pageNum = parseInt(page) || 1;
+      const limitNum = parseInt(limit) || 24;
+      const skip = (pageNum - 1) * limitNum;
+      let query = 'MATCH (m:Movie) ';
+      const params = { skip, limit: limitNum };
+
+      if (search) {
+        query += `
+          WHERE toLower(m.title) CONTAINS toLower($search) 
+          OR toLower(m.genre) CONTAINS toLower($search) 
+          OR toLower(m.overview) CONTAINS toLower($search) 
+        `;
+        params.search = search;
+      }
+
+      query += `
+        RETURN properties(m) AS movie
+        ORDER BY ${sortField} DESC
+        SKIP toInteger($skip)
+        LIMIT toInteger($limit)
+      `;
+
+      const result = await executeQuery(query, params);
+
+      const movies = result.map(record => {
         const movieProperties = record.get('movie');
         return {
           id: movieProperties.movieId,
@@ -37,13 +66,13 @@ class Neo4jController {
           title: movieProperties.title,
           releasedYear: movieProperties.releasedYear,
           overview: movieProperties.overview,
-          gross: movieProperties.gross.low,
-          noOfVotes: movieProperties.noOfVotes.low,
+          gross: movieProperties.gross?.low,
+          noOfVotes: movieProperties.noOfVotes?.low,
           certificate: movieProperties.certificate,
           runtime: movieProperties.runtime,
           posterLink: movieProperties.posterLink,
-          releasedYear: movieProperties.releasedYear.low,
-          metaScore: movieProperties.metaScore.low,
+          releasedYear: movieProperties.releasedYear?.low,
+          metaScore: movieProperties.metaScore?.low,
         };
       });
 
@@ -55,16 +84,34 @@ class Neo4jController {
 
   async getActors(req, res) {
     try {
+      const { page, limit, search } = req.query;
+      const pageNum = parseInt(page) || 1;
+      const limitNum = parseInt(limit) || 24;
+      const skip = (pageNum - 1) * limitNum;
 
-      const page = parseInt(req.query.page, 10) || 1;
-      const limit = parseInt(req.query.limit, 10) || 24;
-      const skip = (page - 1) * limit;
-  
-      const result = await executeQuery(
-        `MATCH (p:Person) WHERE p.primaryProfession = "actor" RETURN properties(p) AS actor SKIP toInteger($skip) LIMIT toInteger($limit)`,
-         { skip: parseInt(skip, 10), limit: parseInt(limit, 10) }
-      );
+      let query = 'MATCH (p:Person) ';
+      const params = { skip, limit: limitNum };
 
+      if (search) {
+        query += `
+          WHERE (
+            toLower(p.name) CONTAINS toLower($search) OR
+            toLower(p.primaryProfession) CONTAINS toLower($search) OR
+            p.birthYear = toInteger($search) OR
+            p.deathYear = toInteger($search)
+          )
+        `;
+        params.search = search;
+      }
+
+      query += `
+        RETURN properties(p) AS actor
+        ORDER BY p.name
+        SKIP toInteger($skip)
+        LIMIT toInteger($limit)
+      `;
+
+      const result = await executeQuery(query, params);
 
       const actors = result.map(record => {
         const actorProperties = record.get('actor');
@@ -72,12 +119,57 @@ class Neo4jController {
           id: actorProperties.personId,
           name: actorProperties.name,
           birthYear: actorProperties.birthYear?.low,
-          deathYear: parseInt(actorProperties.deathYear),
-          primaryProfession: actorProperties.primaryProfession,
+          deathYear: actorProperties.deathYear?.low,
+          primaryProfession: actorProperties.primaryProfession
         };
       });
 
       res.json(actors);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  // In your Neo4j controller
+  async getActorDetails(req, res) {
+    try {
+      const { id } = req.params;
+
+      const result = await executeQuery(`
+      MATCH (a:Person {personId: $id})
+      OPTIONAL MATCH (a)-[acted:ACTED_IN]->(actedMovie:Movie)
+      OPTIONAL MATCH (a)-[directed:DIRECTED]->(directedMovie:Movie)
+      RETURN 
+        properties(a) as actor,
+        collect(DISTINCT {
+          id: actedMovie.movieId,
+          title: actedMovie.title,
+          releasedYear: actedMovie.releasedYear,
+          imdbRating: actedMovie.imdbRating
+        }) as actedMovies,
+        collect(DISTINCT {
+          id: directedMovie.movieId,
+          title: directedMovie.title,
+          releasedYear: directedMovie.releasedYear,
+          imdbRating: directedMovie.imdbRating
+        }) as directedMovies
+    `, { id });
+
+      if (result.length === 0) {
+        return res.status(404).json({ error: 'Actor not found' });
+      }
+
+      const data = result[0];
+      const actor = data.get('actor');
+
+      res.json({
+        id: actor.personId,
+        name: actor.name,
+        birthYear: actor.birthYear?.low,
+        deathYear: actor.deathYear?.low,
+        primaryProfession: actor.primaryProfession,
+        actedMovies: data.get('actedMovies').filter(m => m.id).map(m => { m.releasedYear = m.releasedYear.low; return m }),
+        directedMovies: data.get('directedMovies').filter(m => m.id).map(m => { m.releasedYear = m.releasedYear.low; return m }),
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -185,6 +277,66 @@ class Neo4jController {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+  }
+
+  // In Neo4jController.js
+  async getMovieDetails(req, res) {
+    try {
+      const { id } = req.params;
+
+      const result = await executeQuery(`
+      MATCH (m:Movie {movieId: $id})
+      OPTIONAL MATCH (d:Person)-[:DIRECTED]->(m)
+      OPTIONAL MATCH (a:Person)-[r:ACTED_IN]->(m)
+      RETURN 
+        properties(m) as movie,
+        collect(DISTINCT properties(d)) as directors,
+        collect(DISTINCT {person: properties(a), role: r.role}) as cast
+    `, { id });
+
+      if (result.length === 0) {
+        return res.status(404).json({ error: 'Movie not found' });
+      }
+
+      const movieData = result[0];
+      const movie = this.processMovieProperties(movieData.get('movie'));
+
+      const response = {
+        ...movie,
+        directors: movieData.get('directors').map(d => ({
+          id: d.personId,
+          name: d.name
+        })),
+        cast: movieData.get('cast').map(c => ({
+          id: c.person.personId,
+          name: c.person.name,
+          role: c.role || 'Unknown Role'
+        }))
+      };
+
+      res.json(response);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Helper function
+  processMovieProperties(movie) {
+    return {
+      id: movie.movieId,
+      title: movie.title,
+      overview: movie.overview,
+      genre: movie.genre,
+      imdbRating: movie.imdbRating,
+      releasedYear: movie.releasedYear?.low || null,
+      certificate: movie.certificate,
+      runtime: movie.runtime,
+      posterLink: movie.posterLink,
+      metaScore: movie.metaScore?.low || null,
+      noOfVotes: movie.noOfVotes?.low || null,
+      gross: movie.gross?.low || null,
+      budget: movie.budget?.low || null
+    };
   }
 }
 

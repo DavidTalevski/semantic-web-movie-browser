@@ -1,5 +1,7 @@
 import React from 'react';
 import './ActorCard.css';
+import { Link } from 'react-router-dom';
+
 
 const ActorCard = ({ actor }) => {
   // Generate avatar initials as fallback
@@ -15,11 +17,11 @@ const ActorCard = ({ actor }) => {
   // Calculate age or lifespan
   const getLifespan = () => {
     if (!actor.birthYear) return 'Unknown age';
-    
+
     const deathYear = actor.deathYear || new Date().getFullYear();
     const lifespan = deathYear - actor.birthYear;
-    
-    return actor.deathYear 
+
+    return actor.deathYear
       ? `${lifespan} years (${actor.birthYear} - ${actor.deathYear})`
       : `${lifespan} years old (born ${actor.birthYear})`;
   };
@@ -40,13 +42,18 @@ const ActorCard = ({ actor }) => {
 
       <div className="actor-content">
         <h3 className="actor-name">{actor.name}</h3>
-        
+
         <div className="lifespan">
           {getLifespan()}
         </div>
 
         <div className="profession">
           {formatProfession(actor.primaryProfession)}
+        </div>
+        <div className="details-button-container">
+          <Link to={`/actors/${actor.id}`} className="details-button">
+            View Details
+          </Link>
         </div>
 
         {/* <div className="stats">

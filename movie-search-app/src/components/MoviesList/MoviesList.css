@@ -117,3 +117,22 @@
   font-size: 1.2rem;
 }
 
+.filters-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sort-select {
+  width: 100%;
+  margin-left: 1rem;
+  max-width: 300px;
+  padding: 1rem;
+  border: 2px solid var(--accent);
+  border-radius: 30px;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
