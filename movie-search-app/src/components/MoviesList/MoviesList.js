@@ -2,16 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getMovies } from '../../services/api';
 import MovieCard from '../MovieCard/MovieCard';
 import './MoviesList.css';
-
-// Add debounce hook
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-};
+import useDebounce from '../../hooks/useDebounce';
 
 const MoviesList = () => {
   const [movies, setMovies] = useState([]);
@@ -21,13 +12,13 @@ const MoviesList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [sortBy, setSortBy] = useState('year');
+  const [sortBy, setSortBy] = useState('rating');
 
 
   // Add debounced search query
-  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const debouncedSearchQuery = useDebounce(searchQuery, 250);
 
-  const fetchMovies = useCallback(async (page = 1, search = '', fetchBy = 'year') => {
+  const fetchMovies = useCallback(async (page = 1, search = '', fetchBy = 'rating') => {
     try {
       const data = await getMovies(page, search, fetchBy);
       setMovies(prev => {
@@ -87,8 +78,8 @@ const MoviesList = () => {
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
         >
+          <option value="rating">Rating</option>
           <option value="year">Release Year</option>
-          <option value="rating">IMDB Rating</option>
           <option value="votes">Number of Votes</option>
           <option value="gross">Box Office Gross</option>
         </select>

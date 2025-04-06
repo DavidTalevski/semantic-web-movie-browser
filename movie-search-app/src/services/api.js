@@ -16,7 +16,7 @@ export const getNeo4jInfo = async () => {
 };
 
 // Movies
-export const getMovies = async (page = 1, search = '', sort = 'year') => {
+export const getMovies = async (page = 1, search = '', sort = 'rating') => {
   try {
     const response = await api.get('/movies', {
       params: {

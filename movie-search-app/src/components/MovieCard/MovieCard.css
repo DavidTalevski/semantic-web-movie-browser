@@ -83,6 +83,7 @@
   color: white;
   cursor: pointer;
   transition: background 0.3s ease;
+  text-decoration: none;
   border: none;
 }
 
@@ -90,21 +91,21 @@
   background: #b20710;
 }
 
-.stats-grid {
+.card-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.8rem;
   margin: 1rem 0;
 }
 
-.stat-item {
+.card-stat-item {
   background: rgba(255, 255, 255, 0.05);
   padding: 0.8rem;
   border-radius: 8px;
   text-align: center;
 }
 
-.stat-label {
+.card-stat-label {
   display: block;
   font-size: 0.8rem;
   color: #999;
@@ -147,7 +148,48 @@
     max-width: 100%;
   }
   
-  .stats-grid {
+  .card-stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.movie-card-small {
+  transform: scale(0.85);
+  max-width: 240px;
+}
+
+.movie-card-small .movie-title {
+  font-size: 1rem;
+  min-height: 2.2rem;
+}
+
+.movie-card-small .movie-content {
+  padding: 0.8rem;
+}
+
+.movie-card-small .metadata-row {
+  font-size: 0.75rem;
+  gap: 0.5rem;
+}
+
+.movie-card-small .genre-tag {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+}
+
+.movie-card-small .card-stats-grid {
+  display: none; /* optional: hide stats to simplify */
+}
+
+.movie-card-small .movie-overview {
+  display: none; /* optional: hide for smaller card */
+}
+
+.movie-card-small .details-button-container {
+  margin-top: 0.5rem;
+}
+
+.movie-card-small .details-button {
+  font-size: 0.75rem;
+  padding: 4px 10px;
 }

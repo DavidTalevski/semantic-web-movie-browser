@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './MovieCard.css';import {
+import './MovieCard.css'; import {
   safeNumber,
   formatNumber,
   formatCompactNumber,
@@ -8,7 +8,7 @@ import './MovieCard.css';import {
   enhancePosterUrl,
 } from '../../utils/movieUtils';
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, size = "normal" }) => {
   const [imageError, setImageError] = useState(false);
 
 
@@ -23,18 +23,20 @@ const MovieCard = ({ movie }) => {
 
 
   return (
-    <div className="movie-card">
+    <div className={`movie-card ${size === 'small' ? 'movie-card-small' : ''}`}>
       <div className="poster-container">
         {imageError || !posterUrl ? (
           <div className="no-poster">Poster Not Available</div>
         ) : (
-          <img
-            src={posterUrl}
-            alt={movie.title}
-            className="movie-poster"
-            onError={handleImageError}
-            loading="lazy"
-          />
+          <Link to={`/movies/${movie.id}`}>
+            <img
+              src={posterUrl}
+              alt={movie.title}
+              className="movie-poster"
+              onError={handleImageError}
+              loading="lazy"
+            />
+          </Link>
         )}
         <div className="rating-badge">⭐ {safeNumber(movie.imdbRating)}</div>
       </div>
@@ -56,16 +58,16 @@ const MovieCard = ({ movie }) => {
           ))}
         </div>
 
-        <div className="stats-grid">
-          <div className="stat-item">
+        <div className="card-stats-grid">
+          <div className="card-stat-item">
             <span className="stat-label">Metascore</span>
             <span className="stat-value">{formatNumber(movie.metaScore)}</span>
           </div>
-          <div className="stat-item">
+          <div className="card-stat-item">
             <span className="stat-label">Votes</span>
             <span className="stat-value">{formatCompactNumber(movie.noOfVotes)}</span>
           </div>
-          <div className="stat-item">
+          <div className="card-stat-item">
             <span className="stat-label">Gross</span>
             <span className="stat-value">${formatCompactNumber(movie.gross)}</span>
           </div>
@@ -73,7 +75,7 @@ const MovieCard = ({ movie }) => {
 
         <p className="movie-overview">{movie.overview || 'No overview available...'}</p>
 
-        
+
         <div className="details-button-container">
           <Link to={`/movies/${movie.id}`} className="details-button">
             View Details

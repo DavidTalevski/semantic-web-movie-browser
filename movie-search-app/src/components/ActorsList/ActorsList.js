@@ -13,7 +13,7 @@ const ActorsList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   
-  const debouncedSearch = useDebounce(searchQuery, 500);
+  const debouncedSearch = useDebounce(searchQuery, 250);
 
   const fetchActors = useCallback(async (page = 1, search = '') => {
     try {
@@ -64,7 +64,7 @@ const ActorsList = () => {
 
   return (
     <div className="actors-list-container">
-      <h1 className="page-title">Actors Directory</h1>
+      <h1 className="page-title">People Directory</h1>
       
       <div className="search-container">
         <input

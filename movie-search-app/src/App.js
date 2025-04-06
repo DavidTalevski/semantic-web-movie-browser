@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import MoviesList from "./components/MoviesList/MoviesList";
 import ActorsList from "./components/ActorsList/ActorsList";
-import ActorDetailsPage from './components/ActorDetailsPage/ActorDetailsPage';
-import MovieDetailsPage from './components/MovieDetailsPage/MovieDetailsPage';
+import ActorDetailsPage from './components/DetailsPage/ActorDetailsPage';
+import MovieDetailsPage from './components/DetailsPage/MovieDetailsPage';
 import './App.css';
 
 import { NavLink } from 'react-router-dom';
@@ -28,7 +28,7 @@ function NavigationBar() {
               `nav-link ${isActive ? "active" : ""}`
             }
           >
-            Cast
+            People
           </NavLink>
         </div>
       </div>

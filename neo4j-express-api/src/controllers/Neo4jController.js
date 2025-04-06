@@ -143,12 +143,14 @@ class Neo4jController {
         collect(DISTINCT {
           id: actedMovie.movieId,
           title: actedMovie.title,
+          posterLink: actedMovie.posterLink,
           releasedYear: actedMovie.releasedYear,
           imdbRating: actedMovie.imdbRating
         }) as actedMovies,
         collect(DISTINCT {
           id: directedMovie.movieId,
           title: directedMovie.title,
+          posterLink: directedMovie.posterLink,
           releasedYear: directedMovie.releasedYear,
           imdbRating: directedMovie.imdbRating
         }) as directedMovies

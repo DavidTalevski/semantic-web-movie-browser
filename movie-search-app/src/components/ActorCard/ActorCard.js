@@ -55,17 +55,6 @@ const ActorCard = ({ actor }) => {
             View Details
           </Link>
         </div>
-
-        {/* <div className="stats">
-          <div className="stat-item">
-            <span className="stat-label">Career</span>
-            <span className="stat-value">
-              {actor.deathYear 
-                ? `${actor.birthYear} - ${actor.deathYear}`
-                : `Since ${actor.birthYear}`}
-            </span>
-          </div> */
-        /* </div> */}
       </div>
     </div>
   );
