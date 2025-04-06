@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/semantic-web-movie-browser/static/css/main.0231b408.css",
-    "main.js": "/semantic-web-movie-browser/static/js/main.439f1358.js",
+    "main.js": "/semantic-web-movie-browser/static/js/main.aa663e95.js",
     "index.html": "/semantic-web-movie-browser/index.html",
     "main.0231b408.css.map": "/semantic-web-movie-browser/static/css/main.0231b408.css.map",
-    "main.439f1358.js.map": "/semantic-web-movie-browser/static/js/main.439f1358.js.map"
+    "main.aa663e95.js.map": "/semantic-web-movie-browser/static/js/main.aa663e95.js.map"
   },
   "entrypoints": [
     "static/css/main.0231b408.css",
-    "static/js/main.439f1358.js"
+    "static/js/main.aa663e95.js"
   ]
 }
