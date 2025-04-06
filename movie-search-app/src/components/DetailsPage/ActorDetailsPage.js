@@ -35,8 +35,6 @@ const ActorDetailsPage = () => {
   }
   if (error) return <div className="error">Error: {error}</div>;
 
-  console.log(actorDetails)
-
   return (
     <div className="details-container">
       <Link to="/actors" className="details-back-link">

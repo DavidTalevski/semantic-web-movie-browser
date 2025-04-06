@@ -12,8 +12,6 @@ const ActorCard = ({ actor }) => {
       .toUpperCase();
   };
 
-  console.log(actor)
-
   // Calculate age or lifespan
   const getLifespan = () => {
     if (!actor.birthYear) return 'Unknown age';
